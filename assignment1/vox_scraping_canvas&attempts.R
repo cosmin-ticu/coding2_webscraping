@@ -61,3 +61,5 @@ get_vox_data <- function(searchterm, pages_to_download) {
 }
 
 kukus <- get_vox_data('trump',1) # algorithm cannot yet deal with multiple authors; it lists them as having written separate articles
+
+readRDS('C:/Users/cosmi/Documents/coding2_webscraping/assignment1/exported_scraped_data.rds')

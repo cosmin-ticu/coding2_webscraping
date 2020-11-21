@@ -113,3 +113,8 @@ kukus <- get_vox_data('obama trump birth certificate',5)
 knitr::kable(kukus)
 ```
 
+```{r, include=FALSE}
+saveRDS(kukus, file = "C:/Users/cosmi/Documents/coding2_webscraping/assignment1/exported_scraped_data.rds")
+write.csv(kukus, file = "C:/Users/cosmi/Documents/coding2_webscraping/assignment1/exported_scraped_data.csv")
+```
+
