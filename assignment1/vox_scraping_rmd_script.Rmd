@@ -1,16 +1,22 @@
 ---
-title: "Assignment 1 - Scraping vox.com"
+title: "Coding 2 - Assignment 1 - Scraping Vox.com"
 author: "Cosmin Catalin Ticu"
-date: "11/18/2020"
-output: html_document
+date: "21/11/2020"
+output:   
+  prettydoc::html_pretty:
+    theme: cayman
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(rvest)
-library(data.table)
 library(moments)
+library(data.table)
 ```
+
+## The website of interest was chosen as [Vox.com](https://www.vox.com), one of the most popular liberal media outlets in the United States
+
+The following function facilitates the gathering of information from one single page. The measures of interest were deemed as title, author, date and link.
 
 ```{r}
 get_one_page_from_vox <- function(my_url_vox) {
@@ -27,12 +33,24 @@ get_one_page_from_vox <- function(my_url_vox) {
       html_nodes('.c-entry-box--compact__title') %>% 
       html_text()
     
-    tl[['author']] <- x %>% 
+    tl[['author(s)']] <- x %>% 
       html_nodes('.c-byline__author-name') %>% 
-      html_text()
+      html_text() %>% 
+      toString() # was needed to stop multiple authors showing individually in the list
+    
+    # This code would have also worked.
+    # However, it would have set non-registered authors as "NA" rather than
+    # the default used by Vox which is "Vox Staff".
+    ###
+    # tl[['author']] <- x %>% 
+    # html_nodes('.c-byline__item') %>% 
+    # html_nodes('a') %>% 
+    # html_text()
+    ###
     
     tl[['timestamp']] <- x %>% html_nodes('time.c-byline__item') %>% 
-      html_attr('datetime') %>% strtrim(10) %>% 
+      html_attr('datetime') %>% 
+      strtrim(10) %>% # precise time not of interest
       as.Date()
     
     tl[['link']] <- x %>% 
@@ -43,11 +61,14 @@ get_one_page_from_vox <- function(my_url_vox) {
     
   })
   
-  df <- rbindlist(box_dfs, fill = T) # for inconsistencies across missing authors, titles or dates, the fill was set to TRUE
+  df <- rbindlist(box_dfs, fill = T) 
+  # for inconsistencies across missing values, the fill was set to TRUE
   return(df)
   
 }
 ```
+
+The following function applies a searchterm and a number of pages to download to the first function in an iterative way by using 'lapply'. The 'rbindlist' statement is used to compile the resulting lists into a data frame.
 
 ```{r}
 # example search term "ionel"
@@ -58,10 +79,24 @@ get_vox_data <- function(searchterm, pages_to_download) {
   # concatenate the search terms together according to URL
   searchterm <- gsub(' ','+',searchterm)
   
-  # create links
-  links_to_get <- 
-    c(paste0('https://www.vox.com/search?order=date&q=',searchterm),
-      paste0('https://www.vox.com/search?order=date&page=',2:pages_to_download,'&q=',searchterm))
+  # create links; works also for any number of pages inputted
+  if (pages_to_download == 1){
+  
+    links_to_get <- paste0('https://www.vox.com/search?&q=',
+                           searchterm)
+    
+  }
+  
+  else{
+    
+    links_to_get <- c(paste0('https://www.vox.com/search?&q=',
+                             searchterm),
+                      paste0('https://www.vox.com/search?&page=',
+                             2:pages_to_download,
+                             '&q=',
+                             searchterm))
+    
+  }
   
   ret_df <- 
     rbindlist(lapply(links_to_get, get_one_page_from_vox))
@@ -71,9 +106,10 @@ get_vox_data <- function(searchterm, pages_to_download) {
 }
 ```
 
+The final output of this function can be observed in the example snippet below and the table at the bottom of the page that it subsequently produces.
+
 ```{r, message=FALSE, warning=FALSE}
-kukus <- get_vox_data('trump biden',5) 
-# algorithm cannot yet deal with multiple authors; it lists them as having written separate articles
+kukus <- get_vox_data('obama trump birth certificate',5) 
 knitr::kable(kukus)
 ```
 
