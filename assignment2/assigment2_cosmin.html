@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <section class="main-content">
+<p>The aim of this brief report is to showcase the workings of the Forbes Global 2000 webscraping assignment. The first step was to create a simple scraping function which would get the JSON output of a certain year of the Global 2000 ranking. Below is a snippet of the output table created by the get_forbes_data function for the year 2020.</p>
 <table>
 <caption>Sample of 20 companies for 2020 data</caption>
 <colgroup>
@@ -325,6 +326,9 @@ document.addEventListener('DOMContentLoaded', function() {
 </tr>
 </tbody>
 </table>
+<p>Once the main scraping function was defined with the columns of choice, an lapply and rbindlist call gets us a dataframe of ~20,000 observations for the past 10 years of Forbes Global 2000 data. There is no available data online anymore of the period prior to 2010. See code snippet in orginal markdown if you wish to explore the Global 2000 - 2010-2020 dataframe.</p>
+<p>The next step after creating the main scraping function with the lapply was to alter the original function to tailor to gathering only the URI of the company (unique identifier in this case) and the measure of interest for each year. The code was altered so as to name each markvetValue column of the function through each iteration after the year the data was gathered on. See snippet of code in the original rmd for details. Using a cbind function put all the dataframe together into a list of lists and using the reduce function from the purrr package, I was able to do a right join on each and every table to end up with a dataframe of precisely 2000 entries (corresponding to all the companies that made the 2020 list). Of course, this meant excluding a lot of companies from previous years. As such, a full join code is available as well in order to get the full ~3100 observations of the Global 2000 from 2010 to 2020. This means that almost 1100 companies did not make it through the 2010-2020 period by being on the Forbes Global 2000 list. This just goes to show the sheer variance and unpredictability associated with the global market.</p>
+<p>Once the right joint dataframe was created with each column representing the marketValue for a specific year, some data enrichment was done in order to add filters and color-coding to the racing bar charts that would be later created. See snippet of the code below in the original rmd for details. The industry, country and organization image URLs were gathered for each Global 2000 company in 2020 (in order to match the final right join of the processed mentioned before). This resulted in a complete dataframe of historical data with a categories for each company for better filtering of the racing bar charts. The snippet below shows the table created by the get_forbes_extra_racing_data function with the aforementioned enrichment columns.</p>
 <table>
 <caption>Sample of 20 companies with country, industry and their image URLs</caption>
 <colgroup>
@@ -464,6 +468,13 @@ document.addEventListener('DOMContentLoaded', function() {
 </tr>
 </tbody>
 </table>
+<p>Once the dataframes were merged for the data enrichment process, the samples were created and saved as CSV files in order to upload into <a href="https://flourish.studio/">Flourish</a>. The main output of this webscraping project can be found <a href="https://public.flourish.studio/visualisation/4654452/">here</a>, containing a racing bar chart of the continous top 20 companies of the whole Forbes Global 2000 throughout the years (with color-coded industry). It is interesting to observe in this particular example the rise of the IT giants into a world that was dominated before by Big Oil. <a href="https://public.flourish.studio/visualisation/4654550/">Here</a> is a racing bar chart following the same logic as the previous one but with color-coded countries instead.</p>
+<p>With a few trial samples, a few extra visualizations could be created:</p>
+<ul>
+<li><p><a href="https://public.flourish.studio/visualisation/4654388/">Here</a> is a racing bar chart of the top 20 companies in 2020 and how they compare to each other throughout the last decade. Most notable here is Facebook’s gargantuan rise.</p></li>
+<li><p><a href="https://public.flourish.studio/visualisation/4654414/">Here</a> is a racing bar chart of a random sample of 20 companies from the Forbes Global 2000 enriched dataset and how they stack up throughout the last decade.</p></li>
+<li><p>Lastly, a <a href="https://public.flourish.studio/visualisation/4653353/">racing line chart</a> was also created in order to visualize the ranks of the top 20 companies.</p></li>
+</ul>
 </section>
 
 
